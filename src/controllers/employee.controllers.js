@@ -35,6 +35,7 @@ const createController = async (req, res) => {
             data: newEmployee
         })
     } catch (error) {
+        console.error(error);
         res.status(500).json({
             success: false,
             message: "Internal Server Error",
@@ -57,6 +58,7 @@ const getController = async (req, res) => {
             data: employeedata 
         })
     } catch (error) {
+        console.error(error);
         res.status(500).json({
             success: false,
             message: "Internal Server Error",
@@ -78,6 +80,7 @@ const getbyIdController = async (req, res) => {
 
         const employee = await EmployeeModel.findById(employeeId);
         // console.log(employee)
+
         if (!employee) {
             return res.status(404).json({ error: 'Employee not found' });
         }
@@ -88,6 +91,7 @@ const getbyIdController = async (req, res) => {
             data: employee 
         })
     } catch (error) {
+        console.error(error);
         res.status(500).json({
             success: false,
             message: "Internal Server Error",
@@ -99,16 +103,39 @@ const getbyIdController = async (req, res) => {
 //Edit Controller
 const editController = async (req, res) => {
     try {
-        const {Email} = req.params
-        const employeedata = await EmployeeModel.find({ Email });
-        console.log(employeedata)
+        const employeeId = req.params.id;
+        // console.log(employeeId)
+
+        const {FirstName, LastName, Email, Phone, Gender, DOB, Hobbies, WorkLocation} = req.body;
+        
+
+        if (!mongoose.Types.ObjectId.isValid(employeeId)) {
+            return res.status(400).json({ error: 'Invalid employee ID' });
+        }
+
+
+        const updatedData = await EmployeeModel.findByIdAndUpdate( employeeId, { 
+            FirstName: FirstName,
+            LastName: LastName,
+            Email: Email,
+            Phone: Phone,
+            Gender: Gender,
+            DOB: DOB,
+            Hobbies: Hobbies,
+            WorkLocation: WorkLocation,
+         }, { new:true , runValidators: true});
+        
+        if (!updatedData) {
+            return res.status(404).json({ error: 'Employee not found' });
+        }
 
         res.status(200).json({
             success: true,
             message: "Employee Updated Successfully",
-            data: employeedata 
+            data: updatedData 
         })
     } catch (error) {
+        console.error(error);
         res.status(500).json({
             success: false,
             message: "Internal Server Error",
@@ -117,4 +144,37 @@ const editController = async (req, res) => {
     }
 }
 
-module.exports = {createController, getController, getbyIdController, editController};
+
+//Delete Controller
+const deleteController = async (req, res) => {
+    try {
+        const employeeId = req.params.id;
+        
+        if(!mongoose.Types.ObjectId.isValid(employeeId)){
+            return res.status(400).json({ error: "Invalid employee ID" });
+        }
+
+        const deletedEmployee = await EmployeeModel.findByIdAndDelete(employeeId);
+
+        if (!deletedEmployee) {
+            return res.status(404).json({ error: 'Employee not found' });
+        }
+
+        res.status(200).json({
+            success: true,
+            message: "Employee Removed from Database Successfully",
+            data: deletedEmployee 
+        })
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({
+            success: false,
+            message: "Internal Server Error",
+            error: error.message
+        })
+    }
+}
+
+
+
+module.exports = {createController, getController, getbyIdController, editController, deleteController};
