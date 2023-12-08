@@ -5,35 +5,66 @@ const mongoose = require('mongoose');
 //Create Controller
 const createController = async (req, res) => {
     try {
-        
+        console.log(req.file);
+
         const {FirstName, LastName, Email, Phone, Gender, DOB, Hobbies, WorkLocation} = req.body;
+
+
 
         if (!FirstName || !LastName || !Email || !Phone || !Gender || !DOB || !Hobbies || !WorkLocation) {
             return res.status(400).json({ error: 'All Fields are required fields.' });
-          }
+        }
+
+        // if (req.file) {
+        //     return res.status(400).json({ error: 'Profile image is required.' });
+        // }
 
         const existingEmployee = await EmployeeModel.findOne({ Email });
+
 
         if (existingEmployee) {
             return res.status(400).json({ error: 'Email already exists.' });
         }
 
-        const newEmployee = await EmployeeModel.create({
-            FirstName, 
-            LastName, 
-            Email, 
-            Phone, 
-            Gender, 
-            DOB, 
-            Hobbies, 
-            WorkLocation
-        });
+        if(req.file){
+            const newEmployee = await EmployeeModel.create({
+                FirstName, 
+                LastName, 
+                Email, 
+                Phone, 
+                Gender, 
+                DOB, 
+                Hobbies, 
+                WorkLocation,
+                Profile : req.file.filename
+            });
 
-        return res.status(201).json({
-            success: true,
-            message: "Employee added Successfully",
-            data: newEmployee
-        })
+            return res.status(201).json({
+                success: true,
+                message: "Employee added Successfully",
+                data: newEmployee
+            })
+        }else{
+            const newEmployee = await EmployeeModel.create({
+                FirstName, 
+                LastName, 
+                Email, 
+                Phone, 
+                Gender, 
+                DOB, 
+                Hobbies, 
+                WorkLocation,
+            });
+            
+            return res.status(201).json({
+                success: true,
+                message: "Employee added Successfully",
+                data: newEmployee
+            })
+        }
+
+
+
     } catch (error) {
         console.error(error);
         res.status(500).json({
@@ -162,8 +193,7 @@ const deleteController = async (req, res) => {
 
         res.status(200).json({
             success: true,
-            message: "Employee Removed from Database Successfully",
-            data: deletedEmployee 
+            message: "Employee Removed from Database Successfully"
         })
     } catch (error) {
         console.error(error);

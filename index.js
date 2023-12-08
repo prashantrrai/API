@@ -1,4 +1,5 @@
 const express = require('express');
+const path = require('path');
 require('dotenv').config();
 require('./src/db/db.connection')
 
@@ -7,7 +8,9 @@ const PORT = process.env.PORT || 4040;
 
 app.use(express.json());
 app.use(express.urlencoded({extended: false}));
-app.use(express.static("public"));
+
+const profilepath = path.join(__dirname, 'public', 'uploads');
+app.use(express.static(profilepath));
 
 
 const authRouter = require("./src/routes/auth.routes");
