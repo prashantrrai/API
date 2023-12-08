@@ -1,12 +1,29 @@
 const AuthenticationModel = require("../models/auth.models");
 
 
-const loginController = async (req, res) => {
-
+const registerController = async (req, res) => {
     try {
-        console.log(req.body);
 
+        const {Username, Password, employeeId} = req.body;
+
+
+
+        if (!Username || !Password || !employeeId) {
+            return res.status(400).json({ error: 'All Fields are required fields.' });
+        }
+
+        const newEmployee = await AuthenticationModel.create({
+            Username, 
+            Password, 
+            employeeId, 
+        });
+
+        return res.status(200).json({
+            success: true,
+            message: "Employee Registered Successfully"
+        })
     } catch (error) {
+        console.error(error);
         res.status(500).json({
             success: false,
             message: "Internal Server Error",
@@ -15,4 +32,42 @@ const loginController = async (req, res) => {
     }
 }
 
-module.exports = {loginController};
+const getAuthController = async (req, res) => {
+    try {
+        const authdata = await AuthenticationModel.find();
+
+        return res.status(200).json({
+            success: true,
+            message: "Auth Data fetched Successfully",
+            auth: authdata
+        })
+
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({
+            success: false,
+            message: "Internal Server Error",
+            error: error.message
+        })
+    }
+}
+
+// const loginController = async (req, res) => {
+//     try {
+//         console.log(req.body);
+
+//         return res.status(200).json({
+//             success: true,
+//             message: "Employee Login Successfully"
+//         })
+//     } catch (error) {
+//         console.error(error);
+//         res.status(500).json({
+//             success: false,
+//             message: "Internal Server Error",
+//             error: error.message
+//         })
+//     }
+// }
+
+module.exports = {registerController, getAuthController};

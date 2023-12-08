@@ -9,16 +9,17 @@ const PORT = process.env.PORT || 4040;
 app.use(express.json());
 app.use(express.urlencoded({extended: false}));
 
+//Imp part for getting the file path else will see binary format
 const profilepath = path.join(__dirname, 'public', 'uploads');
 app.use(express.static(profilepath));
 
 
-const authRouter = require("./src/routes/auth.routes");
 const employeeRouter = require("./src/routes/employee.routes");
+const authRouter = require("./src/routes/auth.routes");
 
 
-app.use("/api/v1/auth", authRouter);
 app.use("/api/v1/employees", employeeRouter);
+app.use("/api/v1/auth", authRouter);
 
 
 //Express App

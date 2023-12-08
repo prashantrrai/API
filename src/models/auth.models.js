@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const EmployeeModel = require('./employee.models');
 
 const AuthenticationSchema =  new mongoose.Schema({
     Username: {
@@ -12,7 +13,11 @@ const AuthenticationSchema =  new mongoose.Schema({
         type: String,
         required: [true, 'Password is Required'],
         min_length: 8
-    }
+    },
+    employeeId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: EmployeeModel,
+    },
 },
     { timestamps: true }
 )
