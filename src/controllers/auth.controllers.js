@@ -12,6 +12,11 @@ const registerController = async (req, res) => {
             return res.status(400).json({ error: 'All Fields are required fields.' });
         }
 
+        if (Password.length < 8) {
+            return res.status(400).json({ error: 'Password must be 8 characters' });
+          }
+          
+
         const newEmployee = await AuthenticationModel.create({
             Username, 
             Password, 
@@ -20,7 +25,8 @@ const registerController = async (req, res) => {
 
         return res.status(200).json({
             success: true,
-            message: "Employee Registered Successfully"
+            message: "Employee Registered Successfully",
+            authData: newEmployee
         })
     } catch (error) {
         console.error(error);
@@ -52,22 +58,30 @@ const getAuthController = async (req, res) => {
     }
 }
 
-// const loginController = async (req, res) => {
-//     try {
-//         console.log(req.body);
+const loginController = async (req, res) => {
+    try {
+        const authdata = await AuthenticationModel.find({ Username: req.body.Username });
 
-//         return res.status(200).json({
-//             success: true,
-//             message: "Employee Login Successfully"
-//         })
-//     } catch (error) {
-//         console.error(error);
-//         res.status(500).json({
-//             success: false,
-//             message: "Internal Server Error",
-//             error: error.message
-//         })
-//     }
-// }
+        if(!authdata){
+            return res.status(404).json({ error: 'No data found' });
+        }
+        
+        if(authdata[0].Password != req.body.Password){
+            return res.status(400).json({ error: 'Incorrect password'});
+        }
 
-module.exports = {registerController, getAuthController};
+        return res.status(200).json({
+            success: true,
+            message: "Employee Login Successfully"
+        })
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({
+            success: false,
+            message: "Internal Server Error",
+            error: error.message
+        })
+    }
+}
+
+module.exports = {registerController, getAuthController, loginController};

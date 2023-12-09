@@ -12,11 +12,13 @@ const AuthenticationSchema =  new mongoose.Schema({
     Password: {
         type: String,
         required: [true, 'Password is Required'],
-        min_length: 8
+        minlength: [8, 'Password must be 8 characters'],
     },
     employeeId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: EmployeeModel,
+        trim: true,
+        unique: true
     },
 },
     { timestamps: true }
